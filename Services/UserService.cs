@@ -2,7 +2,7 @@ namespace WebApi.Services;
 
 using AutoMapper;
 using BCrypt.Net;
-using WebApi.Entities;
+using WebApi.Entities.Users;
 using WebApi.Helpers;
 using WebApi.Models.Users;
 
@@ -13,6 +13,7 @@ public interface IUserService
     void Create(CreateRequest model);
     void Update(int id, UpdateRequest model);
     void Delete(int id);
+    User Login(LoginRequest model);
 }
 
 public class UserService : IUserService
@@ -87,5 +88,18 @@ public class UserService : IUserService
         var user = _context.Users.Find(id);
         if (user == null) throw new KeyNotFoundException("User not found");
         return user;
+    }
+
+    public User Login(LoginRequest model) 
+    {
+        var user = _context.Users.Where(u => u.Email.Equals(model.Email)).FirstOrDefault();
+        
+        var passCorrect = user != null ? BCrypt.Verify( model.Password, user.PasswordHash, false, HashType.SHA384) : false;
+
+        if (passCorrect) {
+            return user;
+        } 
+
+        return null;
     }
 }

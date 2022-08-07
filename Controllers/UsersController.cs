@@ -54,4 +54,15 @@ public class UsersController : ControllerBase
         _userService.Delete(id);
         return Ok(new { message = "User deleted" });
     }
+
+    [HttpPost]
+    [Route("login")]
+    public IActionResult Login(LoginRequest model)
+    {
+        var user = _userService.Login(model);
+        if (user != null) {
+            return Ok(user);
+        }
+        return BadRequest(new { message = "Login failed" });
+    }
 }
